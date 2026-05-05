@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from threatlens.data import generate_synthetic_logs
 from threatlens.model import load_model, train_and_save
@@ -57,7 +64,7 @@ with chart_col:
         title="Anomaly score over time",
     )
     fig.update_layout(height=380, margin=dict(l=16, r=16, t=48, b=16))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 with category_col:
     counts = alerts["category"].value_counts().reset_index()
@@ -65,7 +72,7 @@ with category_col:
     if len(counts):
         fig = px.bar(counts, x="alerts", y="category", orientation="h", title="Alert categories")
         fig.update_layout(height=380, margin=dict(l=16, r=16, t=48, b=16))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     else:
         st.info("No alerts above the selected score.")
 
@@ -84,7 +91,7 @@ visible_columns = [
     "unique_dst_ports",
     "connections_last_min",
 ]
-st.dataframe(alerts[visible_columns], use_container_width=True, height=280)
+st.dataframe(alerts[visible_columns], width="stretch", height=280)
 
 st.subheader("Explain an alert")
 if len(alerts):
@@ -101,6 +108,6 @@ if len(alerts):
         f"ThreatLens flagged this as **{alert.category}** with **{alert.severity}** severity "
         f"and an anomaly score of **{alert.anomaly_score:.2f}**."
     )
-    st.dataframe(exp_df, use_container_width=True, hide_index=True)
+    st.dataframe(exp_df, width="stretch", hide_index=True)
 else:
     st.write("No selected alert yet. Lower the score filter or increase injected anomaly rate.")

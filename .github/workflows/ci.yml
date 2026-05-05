@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Train model
+        run: python -m threatlens.model
+
+      - name: API smoke test
+        run: |
+          python - <<'PY'
+          from fastapi.testclient import TestClient
+          from threatlens.api import app
+
+          client = TestClient(app)
+          assert client.get("/health").status_code == 200
+          alert = client.get("/alerts/next")
+          assert alert.status_code == 200
+          payload = alert.json()
+          assert "anomaly_score" in payload
+          assert len(payload["explanations"]) > 0
+          PY
+

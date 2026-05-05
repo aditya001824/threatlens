@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.streamlit/*
+!.streamlit/config.toml
+models/*.joblib
+sample_data/*.csv
+sample_data/*.parquet

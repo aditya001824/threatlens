@@ -1,0 +1,137 @@
+openapi: 3.0.3
+info:
+  title: APIRECON-X Demo Target
+  version: 0.1.0
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+paths:
+  /login:
+    post:
+      tags: [auth]
+      summary: Login
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Token
+  /users/{user_id}:
+    get:
+      tags: [users]
+      summary: Read user profile
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  email:
+                    type: string
+                  role:
+                    type: string
+                  api_token:
+                    type: string
+    patch:
+      tags: [users]
+      summary: Update user profile
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                role:
+                  type: string
+                is_admin:
+                  type: boolean
+      responses:
+        "200":
+          description: Updated
+  /admin/users:
+    get:
+      tags: [admin]
+      summary: List users
+      responses:
+        "200":
+          description: Users
+  /transfer:
+    post:
+      tags: [payments]
+      summary: Transfer funds
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sender:
+                  type: string
+                receiver:
+                  type: string
+                amount:
+                  type: integer
+      responses:
+        "200":
+          description: Queued
+  /coupon/apply:
+    post:
+      tags: [commerce]
+      summary: Apply coupon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                code:
+                  type: string
+                discount:
+                  type: integer
+      responses:
+        "200":
+          description: Applied
+  /webhook/test:
+    post:
+      tags: [integrations]
+      summary: Test webhook
+      parameters:
+        - name: callback_url
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Accepted
